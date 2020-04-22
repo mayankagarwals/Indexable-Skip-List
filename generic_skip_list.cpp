@@ -1,25 +1,37 @@
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
 
+#include <iostream>
+
+#define MAX_OF(type) \
+    (((type)(~0LLU) > (type)((1LLU<<((sizeof(type)<<3)-1))-1LLU)) ? (long long unsigned int)(type)(~0LLU) : (long long unsigned int)(type)((1LLU<<((sizeof(type)<<3)-1))-1LLU))
+
+//(type)((1LLU<<((sizeof(type)<<3)-1))-1LLU)) retrieves the largest possible value using n-1 bits if n bits is total size
+//~0LLU would retreive largest value using all bits. 
+//The condition checks whether type is unsigned or signed and gives appropriate maximum value
+
+using namespace std;
+
+//T should have follwoing defined: ==, sizeof, <
+
+template<typename T>
 class Node
 {
 public:
-	int val;
+	T val;
 	int level;
-	Node** next;  //array of pointers to nodes.
+	Node<T>** next;  //array of pointers to nodes.
 };
 
+template<typename T>
 class SkipList
 {
 public:
 	explicit SkipList(int max_level) : max_level_(max_level) 
 	{
-		head = (Node*)malloc(sizeof(Node));		//header node
+		head = (Node<T>*)malloc(sizeof(Node<T>));		//header node
 		level = 0;									//we start off with just one level
-		head-> val = INT_MAX;
-		head -> next = (Node**)malloc(sizeof(Node*)*(max_level_+1));	//array of pointers to next node at each level. 
+		head-> val = MAX_OF(T);
+		head -> next = (Node<T>**)malloc(sizeof(Node<T>*)*(max_level_+1));	//array of pointers to next node at each level. 
 
 		for(int i = 0; i <= max_level_; ++i)				
 		{
@@ -31,8 +43,8 @@ public:
 
 	~SkipList()
 	{
-		Node* p = head->next[0];
-		Node* next;
+		Node<T>* p = head->next[0];
+		Node<T>* next;
 		while(p != head)
 		{
 			next = p -> next[0];
@@ -45,9 +57,9 @@ public:
 	SkipList(const SkipList&) = delete;					//TODO: Implement Copy constructor
 	SkipList& operator= (const SkipList&) = delete;		//TODO: Implement Copy Assignment
 
-	void insert_node(int key);
-	void delete_node(int key);
-	Node* search(int key);
+	void insert_node(T key);
+	void delete_node(T key);
+	Node<T>* search(T key);
 	void print();
 
 private:
@@ -60,16 +72,17 @@ private:
 		return level;
 	}
 
-	Node* head;
+	Node<T>* head;
 	int level;
 	int max_level_;
 
 };
 
-void SkipList::insert_node(int key)
+template<typename T>
+void SkipList<T>::insert_node(T key)
 {
-	Node* newnode_prev[max_level_];									//array of pointers to nodes. These are those nodes which will point to the  node being inserted.
-	Node* p = head;								
+	Node<T>* newnode_prev[max_level_];									//array of pointers to nodes. These are those nodes which will point to the  node being inserted.
+	Node<T>* p = head;								
 
 	for(int i = level; i >= 0; --i)							
 	{
@@ -90,10 +103,10 @@ void SkipList::insert_node(int key)
 		level = newnode_level;
 	}
 
-	p = (Node*) malloc(sizeof(Node));								//p is the node to be inserted
+	p = (Node<T>*) malloc(sizeof(Node<T>));								//p is the node to be inserted
 	p -> val = key;
 	p -> level = newnode_level;	
-	p -> next = (Node**)malloc(sizeof(Node*)*(newnode_level+1));
+	p -> next = (Node<T>**)malloc(sizeof(Node<T>*)*(newnode_level+1));
 
 	for(int i = 0; i <= newnode_level; ++i)							//stitch new node between
 	{
@@ -102,11 +115,11 @@ void SkipList::insert_node(int key)
 	}
 
 }
-
-void SkipList::delete_node(int key)
+template<typename T>
+void SkipList<T>::delete_node(T key)
 {
-	Node* newnode_prev[max_level_];
-	Node* p = head;
+	Node<T>* newnode_prev[max_level_];
+	Node<T>* p = head;
 
 	for(int i = level; i >= 0; --i)
 	{
@@ -132,9 +145,10 @@ void SkipList::delete_node(int key)
 	}
 }
 
-Node* SkipList::search(int key)
+template<typename T>
+Node<T>* SkipList<T>::search(T key)
 {
-    Node *p = head;
+    Node<T>*p = head;
     
     for (int i = level; i >= 0; --i)
     {
@@ -146,19 +160,20 @@ Node* SkipList::search(int key)
     return NULL;
 }
 
-void SkipList::print()
+template<typename T>
+void SkipList<T>::print()
 {
-    Node *p = head;
+    Node<T>*p = head;
     while (p && p->next[0] != head) {						//traverse base list and print the maximum level;
-        printf("Value:%d, Highest Level:%d\n", p->next[0]->val, p -> next[0] -> level);
+		cout << "Value: " << p->next[0]->val << "Highest Level: " <<  p -> next[0] -> level << '\n';
         p = p -> next[0];
     }
-    printf("\n");
+    cout << '\n';
 }
 
 int main()
 {
-	SkipList list(5);
+	SkipList<int> list(5);
 	int arr[] = {3,7,5,2,8,11,15};
 	for(int i = 0; i < sizeof(arr)/sizeof(int); ++i)
 		list.insert_node(arr[i]);
@@ -169,7 +184,7 @@ int main()
 
 	list.print();
 
-	Node* res = list.search(8);
+	Node<int>* res = list.search(8);
 	if(!res)
 		printf("Not found!\n");
 	else
