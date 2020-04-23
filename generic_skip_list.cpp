@@ -1,6 +1,7 @@
 
 
 #include <iostream>
+#include <unordered_map>
 
 #define MAX_OF(type) \
     (((type)(~0LLU) > (type)((1LLU<<((sizeof(type)<<3)-1))-1LLU)) ? (long long unsigned int)(type)(~0LLU) : (long long unsigned int)(type)((1LLU<<((sizeof(type)<<3)-1))-1LLU))
@@ -21,6 +22,14 @@ public:
 	int level;
 	Node<T>** next;  //array of pointers to nodes.
 	Node<T>* prev;  //level 0 pointer. 
+
+	Node(T val_, int level_)
+	{
+		val = val_;
+		level = level_;
+		next = NULL;
+		prev = NULL;
+	}
 };
 
 template<typename T>
@@ -30,6 +39,7 @@ public:
 	explicit SkipList(int max_level) : max_level_(max_level) 
 	{
 		head = (Node<T>*)malloc(sizeof(Node<T>));		//header node
+		head -> level = max_level_;
 		level = 0;									//we start off with just one level
 		head-> val = MAX_OF(T);
 		head -> next = (Node<T>**)malloc(sizeof(Node<T>*)*(max_level_+1));	//array of pointers to next node at each level. 
@@ -52,22 +62,68 @@ public:
 			free(p);
 			p = next;
 		}
-		free(p);
+		free(p);			//free head;
 	}
 
-	// SkipList(const SkipList& rhs) :  level(rhs.level), max_level_(rhs.max_level_)
-	// {
-	// 	head = (Node<T>*)malloc(sizeof(Node<T>));		//header node
-	// 	head-> val = MAX_OF(T);
-	// 	head -> next = (Node<T>**)malloc(sizeof(Node<T>*)*(max_level_+1));	//array of pointers to next node at each level. 
-	// 	head -> prev
+	SkipList(const SkipList& rhs) :  level(rhs.level), max_level_(rhs.max_level_)
+	{
+		unordered_map<Node<T>*,Node<T>*> ht;					//need a map for a mapping between original nodes and clone nodes
+		//The map is essential to correctly assign all links of node
 
+        head = new Node<T>(rhs.head->val, rhs.max_level_);	 
+		head -> next = (Node<T>**)malloc(sizeof(Node<T>*)*(max_level_+1));
+        Node<T>* p_clone = head;
+        Node<T>* p = rhs.head;
+        ht[rhs.head] = head;				
+        
+		while(p->next[0] != rhs.head)				//iterate creating new nodes and filling the map
+		{
+			p_clone -> next[0] = new Node<T>(p -> next[0] -> val, p -> next[0] -> level);
+			p_clone -> next[0] -> next = (Node<T>**)malloc(sizeof(Node<T>*)*(p -> next[0] -> level+ 1));
+			ht[p -> next[0]] = p_clone -> next[0];
+			p_clone = p_clone -> next[0];
+			p = p -> next[0];
+		}
+		p_clone -> next[0] = head;					//last node should point to head. 
 
-	// }
-	// SkipList& operator= (const SkipList&)
-	// {
+		for(int i = level; i > 0; --i) 				//correct all head links
+		{
+			head -> next[i] = ht[rhs.head -> next[i]];
+		}
+		head -> prev = ht[rhs.head -> prev];
+		p = rhs.head -> next[0];
+		p_clone = head -> next[0];
+		while(p != rhs.head)						//do the same for all rest nodes
+		{
+			for(int i = p -> level; i > 0; --i) 				//correct all head links
+			{
+				p_clone -> next[i] = ht[p -> next[i]];
+			}
+			p_clone -> prev = ht[p -> prev];		
+            p = p -> next[0];
+            p_clone = p_clone -> next[0];	
+		}
 
-	// }
+	}
+	SkipList& operator= (const SkipList& rhs)
+	{
+		if(this != &rhs)
+		{
+			//delete the while skip list.
+			Node<T>* p = head->next[0];
+			Node<T>* next;
+			while(p != head)
+			{
+				next = p -> next[0];
+				free(p);
+				p = next;
+			}
+			free(p);		
+
+			SkipList(rhs);	
+		}
+		return *this;
+	}
 
 	void insert_node(T key);
 	void delete_node(T key);
@@ -182,7 +238,7 @@ template<typename T>
 void SkipList<T>::print()
 {
     Node<T>*p = head;
-    while (p && p->next[0] != head) {						//traverse base list and print the maximum level;
+    while (p->next[0] != head) {						//traverse base list and print the maximum level;
 		cout << "Value: " << p->next[0]->val << ", Highest Level: " <<  p -> next[0] -> level << '\n';
         p = p -> next[0];
     }
@@ -201,6 +257,8 @@ void SkipList<T>::back_link_test()
 	cout << "\nOutput should be decreasing order\n";
 }
 
+
+
 int main()
 {
 	srand(3);
@@ -210,16 +268,33 @@ int main()
 		list.insert_node(arr[i]);
 
 	list.print();
+	//list.back_link_test();
+
+#if 0
+//copy constructor test
+	SkipList<int> l2(list);
+	l2.print();
+	l2.back_link_test();
+
+#endif
+#if 1
+//copy assignment test
+	SkipList<int> l3 = list;
+	l3.print();
+	l3.back_link_test();
+#endif
 
 	list.delete_node(7);
 
 	list.print();
-
+	// list.back_link_test();
+	
 	Node<int>* res = list.search(2);
 	if(!res)
 		printf("Not found!\n");
 	else
 		printf("Found %d\n", res->val);
+
 
 
 	
