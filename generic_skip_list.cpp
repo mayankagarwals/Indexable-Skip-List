@@ -20,6 +20,7 @@ public:
 	T val;
 	int level;
 	Node<T>** next;  //array of pointers to nodes.
+	Node<T>* prev;  //level 0 pointer. 
 };
 
 template<typename T>
@@ -38,7 +39,7 @@ public:
 			head -> next[i] = head;		//initially all levels are pointing to itself (empty skip list)
 		}	
 
-		srand(3);
+		head -> prev = head;		//level 0 back link.
 	}
 
 	~SkipList()
@@ -54,14 +55,24 @@ public:
 		free(p);
 	}
 
-	SkipList(const SkipList&) = delete;					//TODO: Implement Copy constructor
-	SkipList& operator= (const SkipList&) = delete;		//TODO: Implement Copy Assignment
+	// SkipList(const SkipList& rhs) :  level(rhs.level), max_level_(rhs.max_level_)
+	// {
+	// 	head = (Node<T>*)malloc(sizeof(Node<T>));		//header node
+	// 	head-> val = MAX_OF(T);
+	// 	head -> next = (Node<T>**)malloc(sizeof(Node<T>*)*(max_level_+1));	//array of pointers to next node at each level. 
+	// 	head -> prev
 
 
+	// }
+	// SkipList& operator= (const SkipList&)
+	// {
+
+	// }
 
 	void insert_node(T key);
 	void delete_node(T key);
 	Node<T>* search(T key);
+	void back_link_test();
 	void print();
 
 private:
@@ -69,7 +80,7 @@ private:
 	int rand_level()
 	{
 		int level = 0;
-		while (rand() < RAND_MAX/2 && level < max_level_)				//1/2 probability to increase level.
+		while (rand() < RAND_MAX/2 && level < max_level_)				//1/2 probability to increase level., we keep level < max_level_ as condition so that even if level overflows it is a valid level.
 			++level;
 		return level;
 	}
@@ -83,7 +94,7 @@ private:
 template<typename T>
 void SkipList<T>::insert_node(T key)
 {
-	Node<T>* newnode_prev[max_level_];									//array of pointers to nodes. These are those nodes which will point to the  node being inserted.
+	Node<T>* newnode_prev[max_level_ + 1];									//array of pointers to nodes. These are those nodes which will point to the  node being inserted.
 	Node<T>* p = head;								
 
 	for(int i = level; i >= 0; --i)							
@@ -110,17 +121,21 @@ void SkipList<T>::insert_node(T key)
 	p -> level = newnode_level;	
 	p -> next = (Node<T>**)malloc(sizeof(Node<T>*)*(newnode_level+1));
 
+	newnode_prev[0] -> next[0] -> prev = p;					//stiching back link.
+	p -> prev = newnode_prev[0];						//back link for created node
+
 	for(int i = 0; i <= newnode_level; ++i)							//stitch new node between
 	{
 		p -> next[i] = newnode_prev[i] -> next[i];
 		newnode_prev[i] -> next[i] = p;
 	}
+	
 
 }
 template<typename T>
 void SkipList<T>::delete_node(T key)
 {
-	Node<T>* newnode_prev[max_level_];
+	Node<T>* newnode_prev[max_level_ + 1];
 	Node<T>* p = head;
 
 	for(int i = level; i >= 0; --i)
@@ -133,6 +148,7 @@ void SkipList<T>::delete_node(T key)
 
 	if(key == p->val)
 	{
+		p -> next[0] -> prev = p -> prev;					//stiching back link.
 		for(int i = 0; i <= level; ++i)					//adjust links pointing to p
 		{
 			if(newnode_prev[i] -> next[i] != p) break;		
@@ -167,16 +183,29 @@ void SkipList<T>::print()
 {
     Node<T>*p = head;
     while (p && p->next[0] != head) {						//traverse base list and print the maximum level;
-		cout << "Value: " << p->next[0]->val << "Highest Level: " <<  p -> next[0] -> level << '\n';
+		cout << "Value: " << p->next[0]->val << ", Highest Level: " <<  p -> next[0] -> level << '\n';
         p = p -> next[0];
     }
     cout << '\n';
 }
 
+template<typename T>
+void SkipList<T>::back_link_test()
+{
+	Node<T>* p = head -> prev;
+	while(p != head)
+	{
+		cout << p -> val << ' ';
+		p = p -> prev;
+	}
+	cout << "\nOutput should be decreasing order\n";
+}
+
 int main()
 {
-	SkipList<int> list(5);
-	int arr[] = {3,7,5,2,8,11,15};
+	srand(3);
+	SkipList<int> list(3);
+	int arr[] = {3,7,5,2};
 	for(int i = 0; i < sizeof(arr)/sizeof(int); ++i)
 		list.insert_node(arr[i]);
 
@@ -186,11 +215,12 @@ int main()
 
 	list.print();
 
-	Node<int>* res = list.search(8);
+	Node<int>* res = list.search(2);
 	if(!res)
 		printf("Not found!\n");
 	else
 		printf("Found %d\n", res->val);
+
 
 	
 }
