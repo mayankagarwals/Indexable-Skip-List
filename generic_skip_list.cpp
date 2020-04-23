@@ -120,7 +120,42 @@ public:
 			}
 			free(p);		
 
-			SkipList(rhs);	
+			unordered_map<Node<T>*,Node<T>*> ht;					//need a map for a mapping between original nodes and clone nodes
+			//The map is essential to correctly assign all links of node
+
+			head = new Node<T>(rhs.head->val, rhs.max_level_);	 
+			head -> next = (Node<T>**)malloc(sizeof(Node<T>*)*(max_level_+1));
+			Node<T>* p_clone = head;
+			p = rhs.head;
+			ht[rhs.head] = head;				
+			
+			while(p->next[0] != rhs.head)				//iterate creating new nodes and filling the map
+			{
+				p_clone -> next[0] = new Node<T>(p -> next[0] -> val, p -> next[0] -> level);
+				p_clone -> next[0] -> next = (Node<T>**)malloc(sizeof(Node<T>*)*(p -> next[0] -> level+ 1));
+				ht[p -> next[0]] = p_clone -> next[0];
+				p_clone = p_clone -> next[0];
+				p = p -> next[0];
+			}
+			p_clone -> next[0] = head;					//last node should point to head. 
+
+			for(int i = level; i > 0; --i) 				//correct all head links
+			{
+				head -> next[i] = ht[rhs.head -> next[i]];
+			}
+			head -> prev = ht[rhs.head -> prev];
+			p = rhs.head -> next[0];
+			p_clone = head -> next[0];
+			while(p != rhs.head)						//do the same for all rest nodes
+			{
+				for(int i = p -> level; i > 0; --i) 				//correct all head links
+				{
+					p_clone -> next[i] = ht[p -> next[i]];
+				}
+				p_clone -> prev = ht[p -> prev];		
+				p = p -> next[0];
+				p_clone = p_clone -> next[0];	
+			}
 		}
 		return *this;
 	}
