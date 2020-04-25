@@ -15,38 +15,39 @@ using namespace std;
 //T should have follwoing defined: ==, sizeof, <
 
 template <typename T>
-class Node
-{
-public:
-	T val;
-	int level;
-	Node<T> **next; //array of pointers to nodes.
-	Node<T> *prev;	//level 0 pointer.
-	
-	int *widths;	// array of widths per link
-
-	Node(T val_, int level_)
-	{
-		val = val_;
-		level = level_;
-		next = NULL;
-		prev = NULL;
-		widths = NULL;
-	}
-};
-
-template <typename T>
 class SkipList
 {
+
+private:
+	class Node
+	{
+	public:
+		T val;
+		int level;
+		Node **next; //array of pointers to next node at each level.
+		Node *prev;	 //level 0 pointer.
+
+		int *widths; // array of widths per link
+
+		Node(const T &val_, int level_) : val(val_), level(level_),
+										  next(new Node *[level_ + 1]), widths(new int[level_ + 1]),
+										  prev(nullptr)
+		{
+		}
+
+		~Node()
+		{
+			delete[] next;
+			delete[] widths;
+		}
+	};
+
 public:
 	explicit SkipList(int max_level) : max_level_(max_level)
 	{
-		head = (Node<T> *)malloc(sizeof(Node<T>)); //header node
-		head->level = max_level_;
 		level = 0; //we start off with just one level
-		head->val = MAX_OF(T);
-		head->next = (Node<T> **)malloc(sizeof(Node<T> *) * (max_level_ + 1)); //array of pointers to next node at each level.
-		head->widths = (int *) malloc(sizeof(int) * (max_level_ + 1));
+
+		head = new Node(MAX_OF(T), max_level_);
 
 		for (int i = 0; i <= max_level_; ++i)
 		{
@@ -59,32 +60,30 @@ public:
 
 	~SkipList()
 	{
-		Node<T> *p = head->next[0];
-		Node<T> *next;
+		Node *p = head->next[0];
+		Node *next;
 		while (p != head)
 		{
 			next = p->next[0];
-			free(p);
+			delete p;
 			p = next;
 		}
-		free(p); //free head;
+		delete p; //free head
 	}
 
 	SkipList(const SkipList &rhs) : level(rhs.level), max_level_(rhs.max_level_)
 	{
-		unordered_map<Node<T> *, Node<T> *> ht; //need a map for a mapping between original nodes and clone nodes
-												//The map is essential to correctly assign all links of node
+		unordered_map<Node *, Node *> ht; //need a map for a mapping between original nodes and clone nodes
+										  //The map is essential to correctly assign all links of node
 
-		head = new Node<T>(rhs.head->val, rhs.max_level_);
-		head->next = (Node<T> **)malloc(sizeof(Node<T> *) * (max_level_ + 1));
-		Node<T> *p_clone = head;
-		Node<T> *p = rhs.head;
+		head = new Node(rhs.head->val, rhs.max_level_);
+		Node *p_clone = head;
+		Node *p = rhs.head;
 		ht[rhs.head] = head;
 
 		while (p->next[0] != rhs.head) //iterate creating new nodes and filling the map
 		{
-			p_clone->next[0] = new Node<T>(p->next[0]->val, p->next[0]->level);
-			p_clone->next[0]->next = (Node<T> **)malloc(sizeof(Node<T> *) * (p->next[0]->level + 1));
+			p_clone->next[0] = new Node(p->next[0]->val, p->next[0]->level);
 			ht[p->next[0]] = p_clone->next[0];
 			p_clone = p_clone->next[0];
 			p = p->next[0];
@@ -114,29 +113,27 @@ public:
 		if (this != &rhs)
 		{
 			//delete the while skip list.
-			Node<T> *p = head->next[0];
-			Node<T> *next;
+			Node *p = head->next[0];
+			Node *next;
 			while (p != head)
 			{
 				next = p->next[0];
-				free(p);
+				delete p;
 				p = next;
 			}
-			free(p);
+			delete p;
 
-			unordered_map<Node<T> *, Node<T> *> ht; //need a map for a mapping between original nodes and clone nodes
+			unordered_map<Node *, Node *> ht; //need a map for a mapping between original nodes and clone nodes
 			//The map is essential to correctly assign all links of node
 
-			head = new Node<T>(rhs.head->val, rhs.max_level_);
-			head->next = (Node<T> **)malloc(sizeof(Node<T> *) * (max_level_ + 1));
-			Node<T> *p_clone = head;
+			head = new Node(rhs.head->val, rhs.max_level_);
+			Node *p_clone = head;
 			p = rhs.head;
 			ht[rhs.head] = head;
 
 			while (p->next[0] != rhs.head) //iterate creating new nodes and filling the map
 			{
-				p_clone->next[0] = new Node<T>(p->next[0]->val, p->next[0]->level);
-				p_clone->next[0]->next = (Node<T> **)malloc(sizeof(Node<T> *) * (p->next[0]->level + 1));
+				p_clone->next[0] = new Node(p->next[0]->val, p->next[0]->level);
 				ht[p->next[0]] = p_clone->next[0];
 				p_clone = p_clone->next[0];
 				p = p->next[0];
@@ -164,33 +161,27 @@ public:
 		return *this;
 	}
 
-	void insert_node(T key);
-	void delete_node(T key);
-	Node<T> *search(T key);
-	void back_link_test();
-	void print();
-
 	// bidirectional iterator
 	class iterator
 	{
-		public:
-		explicit iterator(Node<T> *p_it = nullptr) : p_it_(p_it) {}
+	public:
+		explicit iterator(Node *p_it = nullptr) : p_it_(p_it) {}
 
-		bool operator==(const iterator& rhs) const
+		bool operator==(const iterator &rhs) const
 		{
 			return p_it_ == rhs.p_it_;
 		}
-		bool operator!=(const iterator& rhs) const
+		bool operator!=(const iterator &rhs) const
 		{
 			return !(*this == rhs);
 		}
 
-		const T& operator*()
+		const T &operator*()
 		{
 			return p_it_->val;
 		}
 
-		iterator& operator++()
+		iterator &operator++()
 		{
 			p_it_ = p_it_->next[0];
 			return *this;
@@ -202,20 +193,20 @@ public:
 			return temp;
 		}
 
-		iterator& operator--()
+		iterator &operator--()
 		{
 			p_it_ = p_it_->prev;
 			return *this;
 		}
-		iterator& operator--(int)
+		iterator &operator--(int)
 		{
 			iterator temp(*this);
 			--*this;
 			return temp;
 		}
 
-		private:
-		Node<T> *p_it_;
+	private:
+		Node *p_it_;
 	};
 
 	iterator begin()
@@ -226,8 +217,12 @@ public:
 	{
 		return iterator(head);
 	}
-	
 
+	void insert_node(T key);
+	void delete_node(T key);
+	typename SkipList<T>::iterator search(T key);
+	void back_link_test();
+	void print();
 
 private:
 	int rand_level()
@@ -238,7 +233,7 @@ private:
 		return level;
 	}
 
-	Node<T> *head;
+	Node *head;
 	int level;
 	int max_level_;
 };
@@ -246,8 +241,8 @@ private:
 template <typename T>
 void SkipList<T>::insert_node(T key)
 {
-	Node<T> *newnode_prev[max_level_ + 1]; //array of pointers to nodes. These are those nodes which will point to the  node being inserted.
-	Node<T> *p = head;
+	Node *newnode_prev[max_level_ + 1]; //array of pointers to nodes. These are those nodes which will point to the  node being inserted.
+	Node *p = head;
 
 	for (int i = level; i >= 0; --i)
 	{
@@ -268,11 +263,7 @@ void SkipList<T>::insert_node(T key)
 		level = newnode_level;
 	}
 
-	p = (Node<T> *)malloc(sizeof(Node<T>)); //p is the node to be inserted
-	p->val = key;
-	p->level = newnode_level;
-	p->next = (Node<T> **)malloc(sizeof(Node<T> *) * (newnode_level + 1));
-	p->widths = (int *) malloc(sizeof(int) * (newnode_level + 1));
+	p = new Node(key, newnode_level); //p is the node to be inserted
 
 	// TODO: add increment-decrement logic for widths
 
@@ -289,8 +280,8 @@ void SkipList<T>::insert_node(T key)
 template <typename T>
 void SkipList<T>::delete_node(T key)
 {
-	Node<T> *newnode_prev[max_level_ + 1];
-	Node<T> *p = head;
+	Node *newnode_prev[max_level_ + 1];
+	Node *p = head;
 
 	for (int i = level; i >= 0; --i)
 	{
@@ -310,8 +301,7 @@ void SkipList<T>::delete_node(T key)
 			newnode_prev[i]->next[i] = p->next[i];
 		}
 
-		free(p->next);
-		free(p);
+		delete p;
 
 		while (level > 0 && head->next[level] == head) //adjust the list's level
 			--level;
@@ -319,9 +309,9 @@ void SkipList<T>::delete_node(T key)
 }
 
 template <typename T>
-Node<T> *SkipList<T>::search(T key)
+typename SkipList<T>::iterator SkipList<T>::search(T key)
 {
-	Node<T> *p = head;
+	Node *p = head;
 
 	for (int i = level; i >= 0; --i)
 	{
@@ -329,14 +319,14 @@ Node<T> *SkipList<T>::search(T key)
 			p = p->next[i];
 	}
 	if (p->next[0]->val == key)
-		return p->next[0];
-	return NULL;
+		return iterator(p->next[0]);
+	return end();
 }
 
 template <typename T>
 void SkipList<T>::print()
 {
-	Node<T> *p = head;
+	Node *p = head;
 	while (p->next[0] != head)
 	{ //traverse base list and print the maximum level;
 		cout << "Value: " << p->next[0]->val << ", Highest Level: " << p->next[0]->level << '\n';
@@ -348,7 +338,7 @@ void SkipList<T>::print()
 template <typename T>
 void SkipList<T>::back_link_test()
 {
-	Node<T> *p = head->prev;
+	Node *p = head->prev;
 	while (p != head)
 	{
 		cout << p->val << ' ';
@@ -387,15 +377,17 @@ int main()
 
 	list.print();
 	// list.back_link_test();
-
-	Node<int> *res = list.search(2);
-	if (!res)
-		printf("Not found!\n");
-	else
-		printf("Found %d\n", res->val);
 #endif
 
 #if 1
+	SkipList<int>::iterator res = list.search(2);
+	if (res == list.end())
+		cout << "Not found!\n";
+	else
+		cout << "Found: " << *res << endl;
+#endif
+
+#if 0
 	cout << "Iterator test" << endl;
 	for (auto &i : list)
 	{
@@ -403,14 +395,13 @@ int main()
 	}
 	cout << endl;
 	SkipList<int>::iterator i1;
-	for (i1=list.end();i1!=list.begin();--i1) 
-    { 
-        if (i1 != list.end()) 
-        { 
-            cout << "val: " << (*i1) << endl; 
-        } 
-    }
+	for (i1 = list.end(); i1 != list.begin(); --i1)
+	{
+		if (i1 != list.end())
+		{
+			cout << "val: " << (*i1) << endl;
+		}
+	}
 	cout << (*i1);
 #endif
-
 }
