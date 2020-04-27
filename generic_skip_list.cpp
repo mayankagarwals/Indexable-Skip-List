@@ -367,8 +367,7 @@ void SkipList<T>::delete_node(const T &key)
 			newnode_prev[i]->next[i] = p->next[i];
 		}
 
-		cout << "Deleting: " << key << '\n';
-		print();
+
 
 		for(int i = 0; i <= p->level; ++i)
 			newnode_prev[i] -> widths[i] += p->widths[i] - 1; //adjust widths
@@ -377,7 +376,6 @@ void SkipList<T>::delete_node(const T &key)
 		for(int i = level+1; i <= max_level_; ++i)
 			head -> widths[i] -= 1;
 
-		print();
 
 		delete p;
 
