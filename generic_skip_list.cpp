@@ -34,7 +34,6 @@ private:
 			delete[] next;
 			delete[] widths;
 		}
-	
 	};
 
 public:
@@ -42,7 +41,7 @@ public:
 	{
 		level = 0; //we start off with just one level
 
-		head = new Node(0, max_level_);				//value of head node doesn't matter.
+		head = new Node(0, max_level_); //value of head node doesn't matter.
 
 		for (int i = 0; i <= max_level_; ++i)
 		{
@@ -87,8 +86,8 @@ public:
 
 		for (int i = level; i > 0; --i) //correct all head links
 		{
-			head -> next[i] = ht[rhs.head -> next[i]];
-			head -> widths[i] = rhs.head -> widths[i];
+			head->next[i] = ht[rhs.head->next[i]];
+			head->widths[i] = rhs.head->widths[i];
 		}
 		head->prev = ht[rhs.head->prev];
 		p = rhs.head->next[0];
@@ -97,8 +96,8 @@ public:
 		{
 			for (int i = p->level; i > 0; --i) //correct all  links
 			{
-				p_clone -> next[i] = ht[p -> next[i]];
-				p_clone -> widths[i] = p -> widths[i];
+				p_clone->next[i] = ht[p->next[i]];
+				p_clone->widths[i] = p->widths[i];
 			}
 			p_clone->prev = ht[p->prev];
 			p = p->next[0];
@@ -139,9 +138,8 @@ public:
 
 			for (int i = level; i > 0; --i) //correct all head links
 			{
-				head -> next[i] = ht[rhs.head->next[i]];
-				head -> widths[i] = rhs.head -> widths[i];
-
+				head->next[i] = ht[rhs.head->next[i]];
+				head->widths[i] = rhs.head->widths[i];
 			}
 			head->prev = ht[rhs.head->prev];
 			p = rhs.head->next[0];
@@ -151,8 +149,7 @@ public:
 				for (int i = p->level; i > 0; --i) //correct all head links
 				{
 					p_clone->next[i] = ht[p->next[i]];
-					p_clone -> widths[i] = p -> widths[i];
-
+					p_clone->widths[i] = p->widths[i];
 				}
 				p_clone->prev = ht[p->prev];
 				p = p->next[0];
@@ -161,7 +158,6 @@ public:
 		}
 		return *this;
 	}
-
 
 	// bidirectional iterator
 	class iterator
@@ -220,19 +216,19 @@ public:
 		return iterator(head);
 	}
 
-	iterator operator[](int index)
+	const T &operator[](int index)
 	{
-		Node* p = head;
+		Node *p = head;
 		index += 1;
 		for (int i = level; i >= 0; --i)
 		{
-			while (p -> widths[i] <=  index)
+			while (p->widths[i] <= index)
 			{
-				index -= p -> widths[i];
-				p = p -> next[i];
+				index -= p->widths[i];
+				p = p->next[i];
 			}
 		}
-		return iterator(p);
+		return p->val;
 	}
 
 	void insert_node(T key);
@@ -261,10 +257,10 @@ void SkipList<T>::insert_node(T key)
 	Node *newnode_prev[max_level_ + 1]; //array of pointers to nodes. These are those nodes which will point to the  node being inserted.
 	Node *p = head;
 
-	vector<int> steps(level+1);
+	vector<int> steps(level + 1);
 	for (int i = level; i >= 0; --i)
 	{
-		while ((p -> next[i] -> val < key) && (p -> next[i] != head))
+		while ((p->next[i]->val < key) && (p->next[i] != head))
 		{
 			p = p->next[i];
 			steps[i] += 1;
@@ -285,66 +281,59 @@ void SkipList<T>::insert_node(T key)
 		level = newnode_level;
 	}
 
-	vector<int> widths(newnode_level+1, 1);
-	for(int i = 1; i <= newnode_level; ++i)
+	vector<int> widths(newnode_level + 1, 1);
+	for (int i = 1; i <= newnode_level; ++i)
 	{
-		widths[i] = steps[i-1] + widths[i-1];
+		widths[i] = steps[i - 1] + widths[i - 1];
 	}
 
-
-
 	p = new Node(key, newnode_level); //p is the node to be inserted
-	p -> widths[0] = 1;				//base level widths is 1. 
-	
-
+	p->widths[0] = 1;				  //base level widths is 1.
 
 	newnode_prev[0]->next[0]->prev = p; //stiching back link.
 	p->prev = newnode_prev[0];			//back link for created node
 
-
 	cout << "Widths before : ";
-	for(int i = 0; i <= max_level_; ++i)
-	{	
-		if(i <= newnode_level)
+	for (int i = 0; i <= max_level_; ++i)
+	{
+		if (i <= newnode_level)
 			cout << newnode_prev[i]->widths[i] << ' ';
 		else
-			cout << head -> widths[i] << ' ';
+			cout << head->widths[i] << ' ';
 	}
-		
+
 	cout << '\n';
 
 	for (int i = 0; i <= newnode_level; ++i) //stitch new node between
 	{
 		p->next[i] = newnode_prev[i]->next[i];
 		newnode_prev[i]->next[i] = p;
-		p -> widths[i] = newnode_prev[i] -> widths[i] - widths[i] + 1;
-		newnode_prev[i] -> widths[i] = widths[i];
+		p->widths[i] = newnode_prev[i]->widths[i] - widths[i] + 1;
+		newnode_prev[i]->widths[i] = widths[i];
 	}
 
-	if(newnode_level < level)
+	if (newnode_level < level)
 	{
-		for(int i = newnode_level + 1; i <= level; ++i)
-			newnode_prev[i] -> widths[i] += 1;
+		for (int i = newnode_level + 1; i <= level; ++i)
+			newnode_prev[i]->widths[i] += 1;
 	}
 
-	for(int i = level + 1; i <= max_level_; ++i)
-		head -> widths[i] += 1;
+	for (int i = level + 1; i <= max_level_; ++i)
+		head->widths[i] += 1;
 
 	cout << "Widths of prev After : ";
-	for(int i = 0; i <= max_level_; ++i)
-	{	
-		if(i <= newnode_level)
+	for (int i = 0; i <= max_level_; ++i)
+	{
+		if (i <= newnode_level)
 			cout << newnode_prev[i]->widths[i] << ' ';
 		else
-			cout << head -> widths[i] << ' ';
+			cout << head->widths[i] << ' ';
 	}
 	cout << '\n';
 	cout << "Widths of inserted node : ";
-	for(int i = 0; i <= newnode_level; ++i)
+	for (int i = 0; i <= newnode_level; ++i)
 		cout << p->widths[i] << ' ';
 	cout << '\n';
-
-
 }
 
 template <typename T>
@@ -355,7 +344,7 @@ void SkipList<T>::delete_node(T key)
 
 	for (int i = level; i >= 0; --i)
 	{
-		while ((p -> next[i] -> val < key) && (p -> next[i] != head))
+		while ((p->next[i]->val < key) && (p->next[i] != head))
 			p = p->next[i];
 		newnode_prev[i] = p;
 	}
@@ -369,7 +358,7 @@ void SkipList<T>::delete_node(T key)
 			if (newnode_prev[i]->next[i] != p)
 				break;
 			newnode_prev[i]->next[i] = p->next[i];
-			newnode_prev[i] -> widths[i] += p -> widths[i] - 1;	//adjust widths
+			newnode_prev[i]->widths[i] += p->widths[i] - 1; //adjust widths
 		}
 
 		delete p;
@@ -386,7 +375,7 @@ typename SkipList<T>::iterator SkipList<T>::search(T key)
 
 	for (int i = level; i >= 0; --i)
 	{
-		while ((p -> next[i] -> val < key) && (p -> next[i] != head))
+		while ((p->next[i]->val < key) && (p->next[i] != head))
 			p = p->next[i];
 	}
 	if (p->next[0]->val == key)
@@ -429,9 +418,8 @@ int main()
 	list.print();
 	//list.back_link_test();
 
-	SkipList<int>::iterator res = list[4];
-	cout << *res << '\n';
-	
+	int res = list[4];
+	cout << res << '\n';
 
 #if 0
 //copy constructor test
