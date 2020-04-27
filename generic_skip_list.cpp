@@ -264,7 +264,7 @@ void SkipList<T>::insert_node(const T &key)
 	Node *newnode_prev[max_level_ + 1]; //array of pointers to nodes. These are those nodes which will point to the  node being inserted.
 	Node *p = head;
 
-	vector<int> steps(level + 1);
+	vector<int> steps(max_level_ + 1);		//max_level_ needed as later widths can be upto newnode_level and no way of knowing that value beforehand
 	for (int i = level; i >= 0; --i)
 	{
 		while ((p->next[i]->val < key) && (p->next[i] != head))
@@ -341,6 +341,9 @@ void SkipList<T>::insert_node(const T &key)
 	// for (int i = 0; i <= newnode_level; ++i)
 	// 	cout << p->widths[i] << ' ';
 	// cout << '\n';
+	cout << "Inserting : " << key << '\n';
+	print();
+
 }
 
 template <typename T>
@@ -381,6 +384,8 @@ void SkipList<T>::delete_node(const T &key)
 
 		while (level > 0 && head->next[level] == head) //adjust the list's level
 			--level;
+	cout << "Deleting : " << key << '\n';
+	print();
 	}
 }
 
@@ -412,7 +417,7 @@ void SkipList<T>::print()
 		cout << "Value: " << p->next[0]->val << ", Highest Level: " << p->next[0]->level << ' ';
 		cout << "Widths: ";
 		for(int i = 0; i <= p->next[0]->level; ++i)
-			cout << p -> next[0] -> widths[i];
+			cout << p -> next[0] -> widths[i] << ' ';
 		cout << '\n';
 		p = p->next[0];
 	}

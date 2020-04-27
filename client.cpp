@@ -31,7 +31,7 @@ int main()
 {
 	srand(3);
 
-#if 0
+#if 1
 	SkipList<int> list(6);
 	int arr[] = {3, 7, 5, 2, 9, 11, 4};
 	for (int i = 0; i < sizeof(arr) / sizeof(int); ++i)
