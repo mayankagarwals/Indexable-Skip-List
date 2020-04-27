@@ -300,14 +300,14 @@ void SkipList<T>::insert_node(const T &key)
 	newnode_prev[0]->next[0]->prev = p; //stiching back link.
 	p->prev = newnode_prev[0];			//back link for created node
 
-	cout << "Widths before : ";
-	for (int i = 0; i <= max_level_; ++i)
-	{
-		if (i <= newnode_level)
-			cout << newnode_prev[i]->widths[i] << ' ';
-		else
-			cout << head->widths[i] << ' ';
-	}
+	// cout << "Widths before : ";
+	// for (int i = 0; i <= max_level_; ++i)
+	// {
+	// 	if (i <= newnode_level)
+	// 		cout << newnode_prev[i]->widths[i] << ' ';
+	// 	else
+	// 		cout << head->widths[i] << ' ';
+	// }
 
 	cout << '\n';
 
@@ -328,19 +328,19 @@ void SkipList<T>::insert_node(const T &key)
 	for (int i = level + 1; i <= max_level_; ++i)
 		head->widths[i] += 1;
 
-	cout << "Widths of prev After : ";
-	for (int i = 0; i <= max_level_; ++i)
-	{
-		if (i <= newnode_level)
-			cout << newnode_prev[i]->widths[i] << ' ';
-		else
-			cout << head->widths[i] << ' ';
-	}
-	cout << '\n';
-	cout << "Widths of inserted node : ";
-	for (int i = 0; i <= newnode_level; ++i)
-		cout << p->widths[i] << ' ';
-	cout << '\n';
+	// cout << "Widths of prev After : ";
+	// for (int i = 0; i <= max_level_; ++i)
+	// {
+	// 	if (i <= newnode_level)
+	// 		cout << newnode_prev[i]->widths[i] << ' ';
+	// 	else
+	// 		cout << head->widths[i] << ' ';
+	// }
+	// cout << '\n';
+	// cout << "Widths of inserted node : ";
+	// for (int i = 0; i <= newnode_level; ++i)
+	// 	cout << p->widths[i] << ' ';
+	// cout << '\n';
 }
 
 template <typename T>
@@ -365,8 +365,19 @@ void SkipList<T>::delete_node(const T &key)
 			if (newnode_prev[i]->next[i] != p)
 				break;
 			newnode_prev[i]->next[i] = p->next[i];
-			newnode_prev[i]->widths[i] += p->widths[i] - 1; //adjust widths
 		}
+
+		cout << "Deleting: " << key << '\n';
+		print();
+
+		for(int i = 0; i <= p->level; ++i)
+			newnode_prev[i] -> widths[i] += p->widths[i] - 1; //adjust widths
+		for(int i = p->level+1; i <= level; ++i)
+			newnode_prev[i] -> widths[i] -= 1;
+		for(int i = level+1; i <= max_level_; ++i)
+			head -> widths[i] -= 1;
+
+		print();
 
 		delete p;
 
@@ -394,9 +405,17 @@ template <typename T>
 void SkipList<T>::print()
 {
 	Node *p = head;
+	cout << "Widths: ";
+	for(int i = 0; i <= p->level; ++i)
+		cout << p -> widths[i];
+	cout << '\n';
 	while (p->next[0] != head)
 	{ //traverse base list and print the maximum level;
-		cout << "Value: " << p->next[0]->val << ", Highest Level: " << p->next[0]->level << '\n';
+		cout << "Value: " << p->next[0]->val << ", Highest Level: " << p->next[0]->level << ' ';
+		cout << "Widths: ";
+		for(int i = 0; i <= p->next[0]->level; ++i)
+			cout << p -> next[0] -> widths[i];
+		cout << '\n';
 		p = p->next[0];
 	}
 	cout << '\n';
