@@ -24,6 +24,12 @@ private:
 
 		int *widths; // array of widths per link
 
+		explicit Node(int level_) : level(level_),
+									 next(new Node *[level_ + 1]), widths(new int[level_ + 1]),
+									 prev(nullptr)
+		{
+		}
+
 		Node(const T &val_, int level_) : val(val_), level(level_),
 										  next(new Node *[level_ + 1]), widths(new int[level_ + 1]),
 										  prev(nullptr)
@@ -42,7 +48,7 @@ public:
 	{
 		level = 0; //we start off with just one level
 
-		head = new Node(0, max_level_); //value of head node doesn't matter.
+		head = new Node(max_level_); //value of head node doesn't matter.
 
 		for (int i = 0; i <= max_level_; ++i)
 		{
@@ -71,7 +77,7 @@ public:
 		unordered_map<Node *, Node *> ht; //need a map for a mapping between original nodes and clone nodes
 										  //The map is essential to correctly assign all links of node
 
-		head = new Node(rhs.head->val, rhs.max_level_);
+		head = new Node(rhs.max_level_);
 		Node *p_clone = head;
 		Node *p = rhs.head;
 		ht[rhs.head] = head;
@@ -123,7 +129,7 @@ public:
 			unordered_map<Node *, Node *> ht; //need a map for a mapping between original nodes and clone nodes
 			//The map is essential to correctly assign all links of node
 
-			head = new Node(rhs.head->val, rhs.max_level_);
+			head = new Node(rhs.max_level_);
 			Node *p_clone = head;
 			p = rhs.head;
 			ht[rhs.head] = head;
@@ -232,9 +238,9 @@ public:
 		return p->val;
 	}
 
-	void insert_node(T key);
-	void delete_node(T key);
-	typename SkipList<T>::iterator search(T key);
+	void insert_node(const T &key);
+	void delete_node(const T &key);
+	typename SkipList<T>::iterator search(const T &key);
 	void back_link_test();
 	void print();
 
@@ -253,7 +259,7 @@ private:
 };
 
 template <typename T>
-void SkipList<T>::insert_node(T key)
+void SkipList<T>::insert_node(const T &key)
 {
 	Node *newnode_prev[max_level_ + 1]; //array of pointers to nodes. These are those nodes which will point to the  node being inserted.
 	Node *p = head;
@@ -338,7 +344,7 @@ void SkipList<T>::insert_node(T key)
 }
 
 template <typename T>
-void SkipList<T>::delete_node(T key)
+void SkipList<T>::delete_node(const T &key)
 {
 	Node *newnode_prev[max_level_ + 1];
 	Node *p = head;
@@ -370,7 +376,7 @@ void SkipList<T>::delete_node(T key)
 }
 
 template <typename T>
-typename SkipList<T>::iterator SkipList<T>::search(T key)
+typename SkipList<T>::iterator SkipList<T>::search(const T &key)
 {
 	Node *p = head;
 
@@ -407,7 +413,5 @@ void SkipList<T>::back_link_test()
 	}
 	cout << "\nOutput should be decreasing order\n";
 }
-
-
 
 #endif // SKIPLIST_DEF

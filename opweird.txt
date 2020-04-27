@@ -1,0 +1,122 @@
+Widths before : 1 1 1 1 1 1 1 
+Widths of prev After : 1 1 2 2 2 2 2 
+Widths of inserted node : 1 1 
+Widths before : 1 1 2 2 2 2 2 
+Widths of prev After : 1 1 2 2 3 3 3 
+Widths of inserted node : 1 1 1 1 
+Widths before : 1 1 2 2 3 3 3 
+Widths of prev After : 1 1 2 2 4 4 4 
+Widths of inserted node : 1 1 1 1 
+Widths before : 1 1 2 2 4 4 4 
+Widths of prev After : 1 2 3 3 5 5 5 
+Widths of inserted node : 1 
+Widths before : 1 1 3 3 5 5 5 
+Widths of prev After : 1 1 3 3 6 6 6 
+Widths of inserted node : 1 1 
+Widths before : 1 1 2 2 6 6 6 
+Widths of prev After : 1 1 2 2 7 7 7 
+Widths of inserted node : 1 1 1 1 
+Widths before : 1 1 3 3 7 7 7 
+Widths of prev After : 1 1 4 4 8 8 8 
+Widths of inserted node : 1 1 
+Value: 2, Highest Level: 0
+Value: 3, Highest Level: 1
+Value: 4, Highest Level: 1
+Value: 5, Highest Level: 3
+Value: 7, Highest Level: 3
+Value: 9, Highest Level: 1
+Value: 11, Highest Level: 3
+
+7
+
+Printing with indices
+2
+3
+4
+5
+7
+9
+11
+Widths before : 1 1 1 1 1 1 1 
+Widths of prev After : 1 1 2 2 2 2 2 
+Widths of inserted node : 1 1 
+Widths before : 1 1 2 2 2 2 2 
+Widths of prev After : 1 1 3 3 3 3 3 
+Widths of inserted node : 1 1 
+Widths before : 1 1 3 3 3 3 3 
+Widths of prev After : 1 1 4 4 4 4 4 
+Widths of inserted node : 1 1 
+Widths before : 1 1 4 4 4 4 4 
+Widths of prev After : 1 1 1 1 5 5 5 
+Widths of inserted node : 1 1 4 4 
+Widths before : 1 1 4 4 5 5 5 
+Widths of prev After : 1 1 4 4 6 6 6 
+Widths of inserted node : 1 1 1 1 
+Widths before : 1 1 1 1 6 6 6 
+Widths of prev After : 1 1 1 1 7 7 7 
+Widths of inserted node : 1 
+Widths before : 1 1 1 1 7 7 7 
+Widths of prev After : 1 1 1 1 8 8 8 
+Widths of inserted node : 1 
+
+
+Value: first: 2 second: 88, Highest Level: 3
+Value: first: 3 second: 10000, Highest Level: 1
+Value: first: 4 second: 22, Highest Level: 0
+Value: first: 5 second: 55, Highest Level: 1
+Value: first: 7 second: 45, Highest Level: 1
+Value: first: 9 second: 99, Highest Level: 3
+Value: first: 11 second: 33, Highest Level: 0
+
+
+Printing with indices
+first: 2 second: 88
+first: 3 second: 10000
+first: 4 second: 22
+first: 5 second: 55
+first: 7 second: 45
+first: 9 second: 99
+first: 11 second: 33
+
+
+
+Widths before : 1 3 6 6 8 8 8 
+Widths of prev After : 1 1 32768 -322104048 9 9 9 
+Widths of inserted node : 1 3 -32761 322104055 
+Widths before : 1 1 32768 -322104048 9 9 9 
+Widths of prev After : 1 1 32768 -322104048 10 10 10 
+Widths of inserted node : 1 
+Widths before : 1 1 32768 -322104048 10 10 10 
+Widths of prev After : 1 1 32768 -322104048 11 11 11 
+Widths of inserted node : 1 
+Widths before : 1 1 32768 -322104048 11 11 11 
+Widths of prev After : 1 2 32769 -322104047 12 12 12 
+Widths of inserted node : 1 
+Widths before : 1 5 32769 -322104047 12 12 12 
+Widths of prev After : 1 3 32769 -322104047 13 13 13 
+Widths of inserted node : 1 3 
+Widths before : 1 3 -32758 -322104047 13 13 13 
+Widths of prev After : 1 1 2 -322104047 14 14 14 
+Widths of inserted node : 1 3 -32759 
+Widths before : 1 3 2 -322104047 14 14 14 
+Widths of prev After : 1 1 1 -322104047 15 15 15 
+Widths of inserted node : 1 3 2 
+
+
+Value: first: 2 second: 88, Highest Level: 0
+Value: first: 3 second: 10000, Highest Level: 3
+Value: first: 4 second: 22, Highest Level: 2
+Value: first: 5 second: 55, Highest Level: 0
+Value: first: 7 second: 45, Highest Level: 0
+Value: first: 9 second: 99, Highest Level: 1
+Value: first: 11 second: 33, Highest Level: 2
+
+
+Printing with indices
+first: 3 second: 10000
+first: 4 second: 22
+first: 5 second: 55
+first: 7 second: 45
+first: 9 second: 99
+first: 11 second: 33
+first: 0 second: 0

@@ -3,6 +3,30 @@
 
 using namespace std;
 
+struct MyPair
+{
+	int first;
+	int second;
+
+	MyPair() {}
+	MyPair(int first_, int second_) : first(first_), second(second_) {}
+
+	bool operator<(const MyPair& rhs) const
+	{
+		return first < rhs.first;
+	}
+
+	bool operator==(const MyPair& rhs) const
+	{
+		return first == rhs.first && second == rhs.second;
+	}
+
+	friend ostream& operator<<(ostream& lhs, const MyPair& rhs)
+	{
+		return lhs << "first: " << rhs.first << " second: " << rhs.second;
+	}
+};
+
 int main()
 {
 	srand(3);
@@ -17,6 +41,11 @@ int main()
 	auto res = list[4];
 	cout << res << '\n';
 
+	cout << "\nPrinting with indices" << endl;
+	for (int i = 0; i < sizeof(arr)/sizeof(int); i++)
+	{
+		cout << list[i] << endl;
+	}
 #if 0
 //copy constructor test
 	SkipList<int> l2(list);
@@ -63,4 +92,56 @@ int main()
 	}
 	cout << (*i1);
 #endif
+
+	//7, 5, 2, 9, 11, 4
+
+	// class test with pairs
+	MyPair pairarr[] = {
+		MyPair(3, 10000),
+		MyPair(7, 45),
+		MyPair(5, 55),
+		MyPair(2, 88),
+		MyPair(9, 99),
+		MyPair(11, 33),
+		MyPair(4, 22)
+	};
+
+	SkipList<MyPair> list_pair(6);
+	for (auto &p : pairarr)
+	{
+		list_pair.insert_node(p);
+	}
+	
+	cout << "\n\n";
+	list_pair.print();
+
+	cout << "\nPrinting with indices" << endl;
+	for (int i = 0; i < sizeof(pairarr)/sizeof(MyPair); i++)
+	{
+		cout << list_pair[i] << endl;
+	}
+
+	for (auto &p : pairarr)
+	{
+		list_pair.delete_node(p);
+	}
+
+	cout << "\n\n";
+	list_pair.print();
+
+	for (auto &p : pairarr)
+	{
+		list_pair.insert_node(p);
+	}
+	
+	cout << "\n\n";
+	list_pair.print();
+
+	cout << "\nPrinting with indices" << endl;
+	for (int i = 0; i < sizeof(pairarr)/sizeof(MyPair); i++)
+	{
+		cout << list_pair[i] << endl;
+	}
+	
+	
 }
