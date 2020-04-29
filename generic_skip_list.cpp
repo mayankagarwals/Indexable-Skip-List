@@ -5,8 +5,6 @@
 #include <unordered_map>
 #include <vector>
 
-using namespace std;
-
 //T should have follwoing defined: ==, sizeof, <
 
 template <typename T>
@@ -44,7 +42,7 @@ private:
 	};
 
 public:
-	explicit SkipList(int max_level) : max_level_(max_level)
+	explicit SkipList(int max_level) : max_level_(max_level), _size(0)
 	{
 		level = 0; //we start off with just one level
 
@@ -72,9 +70,9 @@ public:
 		delete p; //free head
 	}
 
-	SkipList(const SkipList &rhs) : level(rhs.level), max_level_(rhs.max_level_)
+	SkipList(const SkipList &rhs) : level(rhs.level), max_level_(rhs.max_level_), _size(rhs._size)
 	{
-		unordered_map<Node *, Node *> ht; //need a map for a mapping between original nodes and clone nodes
+		std::unordered_map<Node *, Node *> ht; //need a map for a mapping between original nodes and clone nodes
 										  //The map is essential to correctly assign all links of node
 
 		head = new Node(rhs.max_level_);
@@ -126,7 +124,7 @@ public:
 			}
 			delete p;
 
-			unordered_map<Node *, Node *> ht; //need a map for a mapping between original nodes and clone nodes
+			std::unordered_map<Node *, Node *> ht; //need a map for a mapping between original nodes and clone nodes
 			//The map is essential to correctly assign all links of node
 
 			head = new Node(rhs.max_level_);
@@ -170,6 +168,12 @@ public:
 	class iterator
 	{
 	public:
+		using iterator_category = std::bidirectional_iterator_tag;
+		using value_type = T;
+		using difference_type = std::ptrdiff_t;
+		using pointer = T*;
+		using reference = T&;
+
 		explicit iterator(Node *p_it = nullptr) : p_it_(p_it) {}
 
 		bool operator==(const iterator &rhs) const
@@ -243,6 +247,7 @@ public:
 	typename SkipList<T>::iterator search(const T &key);
 	void back_link_test();
 	void print();
+	int size();
 
 private:
 	int rand_level()
@@ -256,6 +261,7 @@ private:
 	Node *head;
 	int level;
 	int max_level_;
+	int _size;
 };
 
 template <typename T>
@@ -264,7 +270,7 @@ void SkipList<T>::insert_node(const T &key)
 	Node *newnode_prev[max_level_ + 1]; //array of pointers to nodes. These are those nodes which will point to the  node being inserted.
 	Node *p = head;
 
-	vector<int> steps(max_level_ + 1);		//max_level_ needed as later widths can be upto newnode_level and no way of knowing that value beforehand
+	std::vector<int> steps(max_level_ + 1);		//max_level_ needed as later widths can be upto newnode_level and no way of knowing that value beforehand
 	for (int i = level; i >= 0; --i)
 	{
 		while ((p->next[i]->val < key) && (p->next[i] != head))
@@ -288,7 +294,7 @@ void SkipList<T>::insert_node(const T &key)
 		level = newnode_level;
 	}
 
-	vector<int> widths(newnode_level + 1, 1);
+	std::vector<int> widths(newnode_level + 1, 1);
 	for (int i = 1; i <= newnode_level; ++i)
 	{
 		widths[i] = steps[i - 1] + widths[i - 1];
@@ -309,7 +315,7 @@ void SkipList<T>::insert_node(const T &key)
 	// 		cout << head->widths[i] << ' ';
 	// }
 
-	cout << '\n';
+	std::cout << '\n';
 
 	for (int i = 0; i <= newnode_level; ++i) //stitch new node between
 	{
@@ -341,8 +347,9 @@ void SkipList<T>::insert_node(const T &key)
 	// for (int i = 0; i <= newnode_level; ++i)
 	// 	cout << p->widths[i] << ' ';
 	// cout << '\n';
-	cout << "Inserting : " << key << '\n';
+	std::cout << "Inserting : " << key << '\n';
 	print();
+	++_size;
 
 }
 
@@ -381,10 +388,11 @@ void SkipList<T>::delete_node(const T &key)
 
 
 		delete p;
+		--_size;
 
 		while (level > 0 && head->next[level] == head) //adjust the list's level
 			--level;
-	cout << "Deleting : " << key << '\n';
+	std::cout << "Deleting : " << key << '\n';
 	print();
 	}
 }
@@ -405,23 +413,29 @@ typename SkipList<T>::iterator SkipList<T>::search(const T &key)
 }
 
 template <typename T>
+int SkipList<T>::size()
+{
+	return _size;
+}
+
+template <typename T>
 void SkipList<T>::print()
 {
 	Node *p = head;
-	cout << "Widths: ";
+	std::cout << "Widths: ";
 	for(int i = 0; i <= p->level; ++i)
-		cout << p -> widths[i];
-	cout << '\n';
+		std::cout << p -> widths[i];
+	std::cout << '\n';
 	while (p->next[0] != head)
 	{ //traverse base list and print the maximum level;
-		cout << "Value: " << p->next[0]->val << ", Highest Level: " << p->next[0]->level << ' ';
-		cout << "Widths: ";
+		std::cout << "Value: " << p->next[0]->val << ", Highest Level: " << p->next[0]->level << ' ';
+		std::cout << "Widths: ";
 		for(int i = 0; i <= p->next[0]->level; ++i)
-			cout << p -> next[0] -> widths[i] << ' ';
-		cout << '\n';
+			std::cout << p -> next[0] -> widths[i] << ' ';
+		std::cout << '\n';
 		p = p->next[0];
 	}
-	cout << '\n';
+	std::cout << '\n';
 }
 
 template <typename T>
@@ -430,10 +444,10 @@ void SkipList<T>::back_link_test()
 	Node *p = head->prev;
 	while (p != head)
 	{
-		cout << p->val << ' ';
+		std::cout << p->val << ' ';
 		p = p->prev;
 	}
-	cout << "\nOutput should be decreasing order\n";
+	std::cout << "\nOutput should be decreasing order\n";
 }
 
 #endif // SKIPLIST_DEF

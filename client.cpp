@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 #include "generic_skip_list.cpp"
 
 using namespace std;
@@ -31,7 +32,7 @@ int main()
 {
 	srand(3);
 
-#if 1
+#if 0
 	SkipList<int> list(6);
 	int arr[] = {3, 7, 5, 2, 9, 11, 4};
 	for (int i = 0; i < sizeof(arr) / sizeof(int); ++i)
@@ -96,8 +97,8 @@ int main()
 	cout << (*i1);
 #endif
 
-	//7, 5, 2, 9, 11, 4
-
+	
+#if 0
 	// class test with pairs
 	MyPair pairarr[] = {
 		MyPair(3, 10000),
@@ -145,6 +146,18 @@ int main()
 	{
 		cout << list_pair[i] << endl;
 	}
+#endif
+
+	SkipList<int> list(6);
+	int arr[] = {3, 7, 5, 2, 9, 11, 4};
+	for (int i = 0; i < sizeof(arr) / sizeof(int); ++i)
+		list.insert_node(arr[i]);
+
+	auto p = find(list.begin(), list.end(), 11);
+	if(p != list.end())
+		cout << "Found: " << *p << endl;
+	else 
+		cout << "Not found" << endl;
 	
-	
+	cout << list.size() << endl;
 }
