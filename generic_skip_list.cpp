@@ -164,6 +164,52 @@ public:
 		return *this;
 	}
 
+	SkipList(SkipList&& rhs) : level(rhs.level), max_level_(rhs.max_level_), _size(rhs._size), head(rhs.head)
+	{
+		rhs.level = 0;
+
+		rhs.head = new Node(rhs.max_level_); 
+
+		for (int i = 0; i <= rhs.max_level_; ++i)
+		{
+			rhs.head->next[i] = rhs.head;
+			rhs.head->widths[i] = 1;
+		}
+
+		rhs.head->prev = rhs.head;
+	}
+
+	SkipList& operator=(SkipList&& rhs)
+	{
+		if(this != &rhs)
+		{
+			// delete current skiplist
+			Node *p = head->next[0];
+			Node *next;
+			while (p != head)
+			{
+				next = p->next[0];
+				delete p;
+				p = next;
+			}
+			delete p;
+
+			level = rhs.level;
+			max_level_ = rhs.max_level_;
+			_size = rhs._size;
+			head = rhs.head;
+
+			rhs.level = 0;
+			rhs.head = new Node(rhs.max_level_); 
+			for (int i = 0; i <= rhs.max_level_; ++i)
+			{
+				rhs.head->next[i] = rhs.head;
+				rhs.head->widths[i] = 1;
+			}
+			rhs.head->prev = rhs.head;
+		}
+	}
+
 	// bidirectional iterator
 	class iterator
 	{

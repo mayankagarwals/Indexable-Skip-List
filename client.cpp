@@ -28,52 +28,60 @@ struct MyPair
 	}
 };
 
+template <typename T>
+void myswap(SkipList<T>& a, SkipList<T>& b)
+{
+	SkipList<T> temp(move(a));
+	a = move(b);
+	b = move(temp);
+}
+
 int main()
 {
 	srand(3);
 
 #if 0
-	SkipList<int> list(6);
+	SkipList<int> l(6);
 	int arr[] = {3, 7, 5, 2, 9, 11, 4};
 	for (int i = 0; i < sizeof(arr) / sizeof(int); ++i)
-		list.insert_node(arr[i]);
+		l.insert_node(arr[i]);
 
-	list.print();
+	l.print();
 	//list.back_link_test();
 
-	auto res = list[4];
-	cout << res << '\n';
+	auto _res = l[4];
+	cout << _res << '\n';
 
 	cout << "\nPrinting with indices" << endl;
 	for (int i = 0; i < sizeof(arr)/sizeof(int); i++)
 	{
-		cout << list[i] << endl;
+		cout << l[i] << endl;
 	}
 #endif
 #if 0
 //copy constructor test
-	SkipList<int> l2(list);
+	SkipList<int> l2(l);
 	l2.print();
 	l2.back_link_test();
 
 #endif
 #if 0
 //copy assignment test
-	SkipList<int> l3 = list;
+	SkipList<int> l3 = l;
 	l3.print();
 	l3.back_link_test();
 #endif
 
 #if 0
-	list.delete_node(7);
+	l.delete_node(7);
 
-	list.print();
+	l.print();
 	// list.back_link_test();
 #endif
 
 #if 0
-	SkipList<int>::iterator res = list.search(2);
-	if (res == list.end())
+	SkipList<int>::iterator res = l.search(2);
+	if (res == l.end())
 		cout << "Not found!\n";
 	else
 		cout << "Found: " << *res << endl;
@@ -148,6 +156,7 @@ int main()
 	}
 #endif
 
+#if 0
 	SkipList<int> list(6);
 	int arr[] = {3, 7, 5, 2, 9, 11, 4};
 	for (int i = 0; i < sizeof(arr) / sizeof(int); ++i)
@@ -160,4 +169,37 @@ int main()
 		cout << "Not found" << endl;
 	
 	cout << list.size() << endl;
+#endif
+
+
+	SkipList<int> m1(6);
+	SkipList<int> m2(6);
+
+	int _m1[] = {7, 3, 1, 8};
+	int _m2[] = {9, 2, 5, 3, 1, 13};
+
+	for (auto &i : _m1)
+	{
+		m1.insert_node(i);
+	}
+
+	for (auto &i : _m2)
+	{
+		m2.insert_node(i);
+	}
+
+	cout << "m1" << endl;
+	m1.print();
+
+	cout << "m2" << endl;
+	m2.print();
+	
+	myswap(m1, m2);
+
+	cout << "m1" << endl;
+	m1.print();
+
+	cout << "m2" << endl;
+	m2.print();
+
 }
