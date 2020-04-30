@@ -40,29 +40,31 @@ int main()
 {
 	srand(3);
 
-#if 0
-	SkipList<int> l(6);
+#if 1
+	SkipList<int> list(6);
 	int arr[] = {3, 7, 5, 2, 9, 11, 4};
 	for (int i = 0; i < sizeof(arr) / sizeof(int); ++i)
-		l.insert_node(arr[i]);
+		list.insert_node(arr[i]);
 
-	l.print();
+	list.print();
 	//list.back_link_test();
 
-	auto _res = l[4];
-	cout << _res << '\n';
+	// auto res = list[4];
+	// cout << res << '\n';
 
-	cout << "\nPrinting with indices" << endl;
-	for (int i = 0; i < sizeof(arr)/sizeof(int); i++)
-	{
-		cout << l[i] << endl;
-	}
+	// cout << "\nPrinting with indices" << endl;
+	// for (int i = 0; i < sizeof(arr)/sizeof(int); i++)
+	// {
+	// 	cout << list[i] << endl;
+	// }
 #endif
-#if 0
+#if 1
 //copy constructor test
-	SkipList<int> l2(l);
+	SkipList<int> l2(list);
 	l2.print();
-	l2.back_link_test();
+	// l2.back_link_test();
+
+	cout << boolalpha << (list == l2) << '\n';
 
 #endif
 #if 0
@@ -80,11 +82,11 @@ int main()
 #endif
 
 #if 0
-	SkipList<int>::iterator res = l.search(2);
-	if (res == l.end())
+	SkipList<int>::iterator res1 = list.search(2);
+	if (res1 == list.end())
 		cout << "Not found!\n";
 	else
-		cout << "Found: " << *res << endl;
+		cout << "Found: " << *res1 << endl;
 #endif
 
 #if 0
@@ -202,4 +204,11 @@ int main()
 	cout << "m2" << endl;
 	m2.print();
 
+	cout << boolalpha;
+	SkipList<int> m3(m1);
+	m3.print();
+
+	cout << "m1 == m2 " << (m1 == m2) << endl;
+	cout << "m1 == m3 " << (m1 == m3) << endl;
+	
 }
