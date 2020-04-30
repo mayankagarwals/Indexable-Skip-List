@@ -138,6 +138,8 @@ public:
 			Node *p_clone = head;
 			p = rhs.head;
 			ht[rhs.head] = head;
+			head -> val = rhs.head -> val;
+
 
 			while (p->next[0] != rhs.head) //iterate creating new nodes and filling the map
 			{
@@ -148,18 +150,20 @@ public:
 			}
 			p_clone->next[0] = head; //last node should point to head.
 
-			for (int i = level; i > 0; --i) //correct all head links
+			for(int i = 0; i <= max_level_; ++i)
 			{
-				head->next[i] = ht[rhs.head->next[i]];
 				head->widths[i] = rhs.head->widths[i];
+				head->next[i] = ht[rhs.head->next[i]];
 			}
+
 			head->prev = ht[rhs.head->prev];
 			p = rhs.head->next[0];
 			p_clone = head->next[0];
 			while (p != rhs.head) //do the same for all rest nodes
 			{
-				for (int i = p->level; i > 0; --i) //correct all head links
+				for (int i = p->level; i >= 0; --i) //correct all head links
 				{
+					if(i != 0)
 					p_clone->next[i] = ht[p->next[i]];
 					p_clone->widths[i] = p->widths[i];
 				}

@@ -208,7 +208,14 @@ int main()
 	SkipList<int> m3(m1);
 	m3.print();
 
+	SkipList<int> m4 = m2;
+	m2.print();
+	
+
 	cout << "m1 == m2 " << (m1 == m2) << endl;
 	cout << "m1 == m3 " << (m1 == m3) << endl;
+	cout << "m2 == m4 " << (m2 == m4) << endl;
+
+
 	
 }
