@@ -40,7 +40,7 @@ int main()
 {
 	srand(3);
 
-#if 1
+#if 0
 	SkipList<int> list(6);
 	int arr[] = {3, 7, 5, 2, 9, 11, 4};
 	for (int i = 0; i < sizeof(arr) / sizeof(int); ++i)
@@ -58,7 +58,7 @@ int main()
 	// 	cout << list[i] << endl;
 	// }
 #endif
-#if 1
+#if 0
 //copy constructor test
 	SkipList<int> l2(list);
 	l2.print();

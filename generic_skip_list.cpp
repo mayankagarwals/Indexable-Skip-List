@@ -82,6 +82,7 @@ public:
 		Node *p_clone = head;
 		Node *p = rhs.head;
 		ht[rhs.head] = head;
+		head -> val = rhs.head -> val;
 
 		while (p->next[0] != rhs.head) //iterate creating new nodes and filling the map
 		{
