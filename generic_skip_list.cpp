@@ -311,12 +311,13 @@ public:
 		do
 		{
 			if(first_list -> level != second_list -> level) return false;
-			for(int i = 0; i <= first_list -> level; ++i)
-			{
-				if(first_list -> widths[i] != second_list -> widths[i]) return false;
-				if(first_list -> next[i] -> val != second_list -> next[i] -> val) return false;
-			}
-			if(first_list -> prev -> val != second_list -> prev -> val) return false;
+			if(first_list -> val != second_list -> val) return false;
+			// for(int i = 0; i <= first_list -> level; ++i)
+			// {
+			// 	if(first_list -> widths[i] != second_list -> widths[i]) return false;
+			// 	if(first_list -> next[i] -> val != second_list -> next[i] -> val) return false;
+			// }
+			// if(first_list -> prev -> val != second_list -> prev -> val) return false;
 
 			first_list = first_list -> next[0];
 			second_list = second_list -> next[0];
