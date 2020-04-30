@@ -8,7 +8,6 @@ This is a generic implementation of Indexable Skip List. The data strucutre is p
 
 If you are using a user defined type, make sure to support the above operations. An example has been provided in src/client.cpp. 
 
- Details about the data structure can be found in the attached pdf.
 
 The project includes a makefile. Run `make` to compile the program and then `./a.out` to run the program.
 
