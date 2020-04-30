@@ -76,6 +76,9 @@ public:
 										  //The map is essential to correctly assign all links of node
 
 		head = new Node(rhs.max_level_);
+
+
+
 		Node *p_clone = head;
 		Node *p = rhs.head;
 		ht[rhs.head] = head;
@@ -89,18 +92,21 @@ public:
 		}
 		p_clone->next[0] = head; //last node should point to head.
 
-		for (int i = level; i > 0; --i) //correct all head links
+
+		for(int i = 0; i <= max_level_; ++i)
 		{
-			head->next[i] = ht[rhs.head->next[i]];
 			head->widths[i] = rhs.head->widths[i];
+			head->next[i] = ht[rhs.head->next[i]];
 		}
+
 		head->prev = ht[rhs.head->prev];
 		p = rhs.head->next[0];
 		p_clone = head->next[0];
 		while (p != rhs.head) //do the same for all rest nodes
 		{
-			for (int i = p->level; i > 0; --i) //correct all  links
+			for (int i = p->level; i >= 0; --i) //correct all  links
 			{
+				if(i!= 0)
 				p_clone->next[i] = ht[p->next[i]];
 				p_clone->widths[i] = p->widths[i];
 			}
@@ -242,6 +248,33 @@ public:
 		return p->val;
 	}
 
+	bool operator==(const SkipList& rhs)
+	{
+		if(max_level_ != rhs.max_level_) return false;
+		if(level != rhs.level) return false;
+		if(_size != rhs._size) return false;
+
+		Node* first_list = head;
+		Node* second_list = rhs.head;
+
+		do
+		{
+			if(first_list -> level != second_list -> level) return false;
+			for(int i = 0; i <= first_list -> level; ++i)
+			{
+				if(first_list -> widths[i] != second_list -> widths[i]) return false;
+				if(first_list -> next[i] -> val != second_list -> next[i] -> val) return false;
+			}
+			if(first_list -> prev -> val != second_list -> prev -> val) return false;
+
+			first_list = first_list -> next[0];
+			second_list = second_list -> next[0];
+		}while(first_list != head && second_list != rhs.head);
+
+		return true;
+
+	}
+
 	void insert_node(const T &key);
 	void delete_node(const T &key);
 	typename SkipList<T>::iterator search(const T &key);
@@ -253,7 +286,7 @@ private:
 	int rand_level()
 	{
 		int level = 0;
-		while (rand() > RAND_MAX / 4 && level < max_level_) //1/2 probability to increase level., we keep level < max_level_ as condition so that even if level overflows it is a valid level.
+		while (rand() > RAND_MAX / 2 && level < max_level_) //1/2 probability to increase level., we keep level < max_level_ as condition so that even if level overflows it is a valid level.
 			++level;
 		return level;
 	}
@@ -306,14 +339,6 @@ void SkipList<T>::insert_node(const T &key)
 	newnode_prev[0]->next[0]->prev = p; //stiching back link.
 	p->prev = newnode_prev[0];			//back link for created node
 
-	// cout << "Widths before : ";
-	// for (int i = 0; i <= max_level_; ++i)
-	// {
-	// 	if (i <= newnode_level)
-	// 		cout << newnode_prev[i]->widths[i] << ' ';
-	// 	else
-	// 		cout << head->widths[i] << ' ';
-	// }
 
 	std::cout << '\n';
 
@@ -334,21 +359,8 @@ void SkipList<T>::insert_node(const T &key)
 	for (int i = level + 1; i <= max_level_; ++i)
 		head->widths[i] += 1;
 
-	// cout << "Widths of prev After : ";
-	// for (int i = 0; i <= max_level_; ++i)
-	// {
-	// 	if (i <= newnode_level)
-	// 		cout << newnode_prev[i]->widths[i] << ' ';
-	// 	else
-	// 		cout << head->widths[i] << ' ';
-	// }
-	// cout << '\n';
-	// cout << "Widths of inserted node : ";
-	// for (int i = 0; i <= newnode_level; ++i)
-	// 	cout << p->widths[i] << ' ';
-	// cout << '\n';
-	std::cout << "Inserting : " << key << '\n';
-	print();
+	// std::cout << "Inserting : " << key << '\n';
+	// print();
 	++_size;
 
 }
@@ -392,8 +404,8 @@ void SkipList<T>::delete_node(const T &key)
 
 		while (level > 0 && head->next[level] == head) //adjust the list's level
 			--level;
-	std::cout << "Deleting : " << key << '\n';
-	print();
+	// std::cout << "Deleting : " << key << '\n';
+	// print();
 	}
 }
 
